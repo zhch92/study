@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<link href="city.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="jquery-1.4.2.js"></script>
+<script type="text/javascript" src="1.js"></script>
+<style>
+    
+
+*{
+    margin:0;
+    padding:0;}
+ 
+.dropdown_window{
+    background-color: #FFFFFF;
+    border: 1px solid #CBE3F7;
+    margin: 0;
+    padding: 7px 0 15px 15px;
+    width: 257px;
+    overflow:hidden;
+    }
+     
+.aCity{
+    background:url(xiala.jpg) no-repeat scroll right top transparent;
+    border: 1px solid #7F9DB9;
+    color: black;
+    cursor: pointer;
+    font-size: 12px;
+    height: 12px;
+    line-height: 18px;
+    margin: 0;
+    padding: 4px 25px 2px 7px;
+    text-decoration: none;
+    }
+     
+.ziduan{
+    width:64px;
+    height:24px;
+    color: #004B91;
+    text-decoration: none;
+    font-size:12px;
+    line-height:24px;
+    text-align:center;
+    display:block;
+    float:left;
+    }
+     
+.ziduan:hover{
+    color:#F60;
+    text-decoration:underline;
+    }
+     
+.ziduanCity{
+     
+    height:24px;
+    color: #004B91;
+    text-decoration: none;
+    font-size:12px;
+    line-height:24px;
+    text-align:center;
+    display:block;
+    float:left;
+    margin-left:5px;
+    margin-right:5px;
+    }
+     
+.ziduanCity:hover{
+    color:#F60;
+    text-decoration:underline;
+    }   
+     
+.ziduanErea{
+    width:auto;
+    height:24px;
+    color: #004B91;
+    text-decoration: none;
+    font-size:12px;
+    line-height:24px;
+    text-align:center;
+    display:block;
+    float:left;
+    margin-left:5px;
+    margin-right:5px;
+    }
+     
+.ziduanErea:hover{
+    color:#F60;
+    text-decoration:underline;
+    }   
+</style>
+</head>
+<body >
+    <div id="cityDiv">
+        <a class="aCity" id="aPro" >请选择省</a>
+        <a class="aCity" id="aCity">请选择市</a>
+        <a class="aCity" id="aArea">请选择区县</a>
+    </div>
+
+
+    <script>
+$(document).ready(function(){
+
+
+    /*
+             * $.get()或$.post()方法来解析xml文件
+             *  * url：指定要解析的xml文件的路径
+             *  * callback：回调函数，function(xml){}
+             *      * xml：解析xml文件返回的内容
+             */
+$.get("area.xml", function (xml) {
+ 
+    var docXml = xml;
+ 
+    var $provinceElements = $(docXml).find("province");
+    var $proEle = $("#cityDiv"); //a链接的div
+    var $divEle = $("<div class='dropdown_window' id='divPro'></div> ");
+    var $divEleCity = $("<div class='dropdown_window' style='margin-left:66px;' id='divCity'></div> ");
+    var $divEleArea = $("<div class='dropdown_window' style='margin-left:144px;' id='divArea'></div> ");
+    //遍历所有的省，写到第一个div中
+    $provinceElements.each(function (index, domEle) {
+        var $provinceValue = $(domEle).attr("name"); //获得省的值
+        //创建span标签
+        var $optionElement = $("<a class='ziduan' href='javascript:void(0);' ></a>");
+        //  $optionElement.attr("value",$provinceValue);
+        $optionElement.text($provinceValue);
+        //创建div
+        $divEle.append($optionElement);
+    });
+ 
+    $("#aPro").click(function () {
+        //先把市，区隐藏起来
+        $("#divCity").hide();
+        $("#divArea").hide();
+        // alert($("#divPro"));
+        $proEle.after($divEle);
+        var $divPro = $("#divPro");//获得div,判断是否显示
+        if($divPro.is(":hidden")){//如果省的div被隐藏，让他显示
+            $divPro.attr("style","display:block;");
+        }
+    
+     
+    });
+ 
+ 
+    //给省添加click事件，获得选中的值，并显示在
+    $(".ziduan").live('click',function () {
+        var $clickPro = $(this).text();//获得点击的省的名称
+        //赋值给省a标签
+        $("#aPro").text($clickPro);
+        //隐藏div
+        $("#divPro").hide();
+         
+        //创建市的div
+        var $clickPro = $("#aPro").text();
+        //获得市div中的内容，清空
+        $("#divCity").html("");
+        //市页面上的a标签中的内容变为请选择市
+        $("#aCity").text("请选择市");
+        //获得区div中的内容，清空
+        $("#divArea").html("");
+        //市页面上的a标签中的内容变为请选择市
+        $("#aArea").text("请选择区县");
+         
+        // 遍历省，找到与选中值相同的，得到所有的市
+        var $flag = true;
+        $provinceElements.each(function (index, domEle) {
+            var $provinceValue = $(domEle).attr("name");
+         
+            if($flag){
+                if ($clickPro == $provinceValue) {
+                    $flag = false;
+                    var $cityElements = $(domEle).find("city");
+                    //遍历市
+                    $cityElements.each(function (index, domEle){
+                        var $cityValue = $(domEle).attr("name");
+                        //创建option标签
+                         var $optionElement = $("<a class='ziduanCity' href='javascript:void(0);' ></a>");
+                        //  $optionElement.attr("value",$provinceValue);
+                        $optionElement.text($cityValue);
+                        //创建div
+                        $divEleCity.append($optionElement);
+                    });
+                }
+            }
+        });
+     });
+     
+ 
+    //点击市，弹出下拉框
+ 
+    $("#aCity").click(function(){
+        //先把省，区隐藏起来
+        $("#divPro").hide();
+        $("#divArea").hide();
+        //获得省的内容，如果没有选择就不显示div
+        var $clickPro = $("#aPro").text();
+        if($clickPro.indexOf('请选择省')<0){
+            //已经选择了省
+            var $divCity = $("#divCity");//获得div,判断是否显示
+            //alert($divCity);
+            if($divCity.is(":hidden")){//如果省的div被隐藏，让他显示
+                $divCity.attr("style","margin-left:66px;display:block;");
+            }
+            //添加到body中
+            $proEle.after($divEleCity);
+        }
+         
+         
+    });
+ 
+    //给市添加click事件，获得选中的值，并显示在页面
+    $(".ziduanCity").live('click',function () {
+        var $clickCity = $(this).text();//获得点击的市的名称
+     
+        //赋值给市a标签
+        $("#aCity").text($clickCity);
+        //隐藏div
+        $("#divCity").hide();
+         
+         
+        var $clickCity = $(this).text();//获得点击的市的名称
+        var $clickPro = $("#aPro").text();//获得省
+        //获得区div中的内容，清空
+        $("#divArea").html("");
+        //市页面上的a标签中的内容变为请选择市
+        $("#aArea").text("请选择区县");
+        // 遍历省，找到与选中值相同的，得到所有的市
+        var $flag = true;
+        $provinceElements.each(function (index, domEle) {
+            var $provinceValue = $(domEle).attr("name");
+            if ($clickPro == $provinceValue) {
+                var $cityElements = $(domEle).find("city");
+                $cityElements.each(function (index, domEle) {
+                    var $cityValue = $(domEle).attr("name");
+                    if ($clickCity == $cityValue) {
+                        var $countyElements = $(domEle).find("county");
+                        $countyElements.each(function (index, domEle) {
+                            var $countyValue = $(domEle).attr("name");
+                            var $optionElement = $("<a class='ziduanErea' href='javascript:void(0);' ></a>");
+                            //  $optionElement.attr("value",$provinceValue);
+                            $optionElement.text($countyValue);
+                            //创建div
+                            $divEleArea.append($optionElement);
+                      
+                        });
+                    }
+                });
+            }
+        });
+    });
+     
+    $("#aArea").click(function(){
+        //先把省市隐藏起来
+        $("#divPro").hide();
+        $("#divCity").hide();
+        //获得省的内容，如果没有选择就不显示div
+        var $clickPro = $("#aPro").text();
+        var $clickCity = $("#aCity").text();
+        if($clickPro.indexOf('请选择省')<0 && $clickCity.indexOf('请选择市')<0 ){
+            var $divArea = $("#divArea");//获得div,判断是否显示
+            //alert($divCity);
+            if($divArea.is(":hidden")){//如果省的div被隐藏，让他显示
+                $divArea.attr("style","margin-left:144px;display:block;");
+            }
+            //添加到body中
+            $proEle.after($divEleArea);
+        }
+         
+    });
+ 
+ 
+    //给区添加click事件，获得选中的值，并显示在页面上
+    $(".ziduanErea").live('click',function () {
+        //先把省，市隐藏起来
+        var $clickArea = $(this).text();//获得点击的区的名称
+     
+        //赋值给省a标签
+        $("#aArea").text($clickArea);
+        //隐藏div
+        $("#divArea").hide();
+    });
+ 
+ 
+});
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+            
+})
+
+
+    </script>
+</body>
+</html>
